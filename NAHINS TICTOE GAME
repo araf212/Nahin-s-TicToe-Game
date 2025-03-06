@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define BLUE "\033[34m"
+#define YELLOW "\033[33m"
+#define RESET "\033[0m"
+
+char board[3][3];
+
+void resetBoard() {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            board[i][j] = '1' + (i * 3 + j);
+        }
+    }
+}
+
+void printBoard() {
+    system("clear"); // Use "cls" for Windows
+    printf(BLUE "\n    Tic-Tac-Toe\n" RESET);
+    printf(YELLOW "  Player X - Red | Player O - Green\n\n" RESET);
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (board[i][j] == 'X')
+                printf(RED "  %c  " RESET, board[i][j]);
+            else if (board[i][j] == 'O')
+                printf(GREEN "  %c  " RESET, board[i][j]);
+            else
+                printf("  %c  ", board[i][j]);
+            if (j < 2) printf("|");
+        }
+        printf("\n");
+        if (i < 2) printf("----------------\n");
+    }
+    printf("\n");
+}
+
+int checkWin() {
+    for (int i = 0; i < 3; i++) {
+        if (board[i][0] == board[i][1] && board[i][1] == board[i][2]) return 1;
+        if (board[0][i] == board[1][i] && board[1][i] == board[2][i]) return 1;
+    }
+    if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) return 1;
+    if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) return 1;
+    return 0;
+}
+
+int isFull() {
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            if (board[i][j] >= '1' && board[i][j] <= '9') return 0;
+    return 1;
+}
+
+void playGame() {
+    char turn = 'X';
+    int choice;
+    while (1) {
+        printBoard();
+        printf("%sPlayer %c, enter your move (1-9): " RESET, turn == 'X' ? RED : GREEN, turn);
+        scanf("%d", &choice);
+        if (choice < 1 || choice > 9) continue;
+        int row = (choice - 1) / 3, col = (choice - 1) % 3;
+        if (board[row][col] == 'X' || board[row][col] == 'O') continue;
+        board[row][col] = turn;
+        if (checkWin()) {
+            printBoard();
+            printf("%sPlayer %c wins!\n" RESET, turn == 'X' ? RED : GREEN, turn);
+            break;
+        }
+        if (isFull()) {
+            printBoard();
+            printf(YELLOW "It's a draw!\n" RESET);
+            break;
+        }
+        turn = (turn == 'X') ? 'O' : 'X';
+    }
+}
+
+int main() {
+    while (1) {
+        resetBoard();
+        playGame();
+        printf(BLUE "\nPlay again? (y/n): " RESET);
+        char choice;
+        scanf(" %c", &choice);
+        if (choice == 'n' || choice == 'N') break;
+    }
+    return 0;
+}
